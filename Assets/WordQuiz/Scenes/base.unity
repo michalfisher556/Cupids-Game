@@ -1617,7 +1617,7 @@ MonoBehaviour:
       of it disappears,           and soon takes other forms when           something
       else comes.             Believe me, it will go just          as far out of
       sight as '
-    questionImage: {fileID: 8191238206599682988, guid: 82ffdd381780f8646b69cbfd50be0c1a,
+    questionImage: {fileID: -3056224842530654951, guid: 4e1b5aa4e755eb34d9936d3a631449fc,
       type: 3}
     answer: out of mind
   inputFields:

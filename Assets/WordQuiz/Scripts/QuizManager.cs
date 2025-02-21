@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class QuizManager : MonoBehaviour
 {
@@ -34,6 +35,8 @@ public class QuizManager : MonoBehaviour
 
     private AudioSource audioSource;
     private int hintIndex = 0;
+    private int mistakes = 0;
+    private int firstWordLength = 0;
 
     private void Start()
     {
@@ -74,7 +77,7 @@ public class QuizManager : MonoBehaviour
         userInput += inputField.text; // Append each input field's text
     }
     
-
+    hintIndex = 0;
     userInput = userInput.ToUpper().Trim(); // Convert to uppercase and trim spaces
     Debug.Log("User input (processed): " + userInput);
 
@@ -85,14 +88,30 @@ public class QuizManager : MonoBehaviour
     // Compare processed user input with processed correct answer
     if (userInput == correctAnswer)
     {
+         Debug.Log("Correct");
+
         PlaySound(correctSound);
         DisplayMessage("CORRECT! 🎉", Color.green);
         ProceedToNextQuestion();
+
+       
     }
     else
     {
+        Debug.Log("Wrong");
+
         HighlightLetters(userInput, correctAnswer);
+         DisplayMessage("Wrong! 🎉", Color.red);
         PlaySound(wrongSound);
+
+        mistakes ++;
+
+        
+
+        if(mistakes > 3)
+        {
+            Debug.LogWarning("Too many mistakes");
+        }
     }
 
     // Clear all input fields after checking
@@ -100,6 +119,8 @@ public class QuizManager : MonoBehaviour
     {
         inputField.text = "";
     }
+
+    
 }
 
 
@@ -142,6 +163,7 @@ public class QuizManager : MonoBehaviour
 
     private IEnumerator FadeMessage()
     {
+        Debug.Log("Fade Message called");
         float duration = 2f;
         float elapsedTime = 0f;
 
@@ -156,17 +178,151 @@ public class QuizManager : MonoBehaviour
         }
 
         messageText.color = endColor;
+
     }
 
     private void ProceedToNextQuestion()
     {
         hintIndex = 0;
-        LoadNextQuestion();
+       StartCoroutine(LoadNextQuestion());
+
     }
 
-    private void LoadNextQuestion()
+
+
+    private IEnumerator LoadNextQuestion()
     {
         Debug.Log("Loading the next question...");
+
+        int next = SceneManager.GetActiveScene().buildIndex + 1; 
+
+        yield return new WaitForSeconds(1.75f);
+       
+       if (next < SceneManager.sceneCountInBuildSettings)
+       {
+         SceneManager.LoadSceneAsync(next);
+       }
+       else
+       {
+         Debug.LogWarning("No more scenes to load!"); 
+       }
+}
+
+
+    public void HintSystem()
+    {
+        hintIndex ++;
+
+        switch(hintIndex)
+        {
+            case 1:
+              firstHint();
+              break;
+            case 2:
+              secondHint();
+              break;
+            case 3:
+              thirdHint();
+              break;
+            default:
+              Debug.LogWarning("no more hints");
+              break;
+        }
+        
     }
+
+
+
+
+
+    private void firstHint()
+    {
+      Debug.Log("first Hint");
+      firstWordLength = question.answer.IndexOf(' ');
+
+      if (firstWordLength == -1)
+      {
+        // If there's no space, the entire answer is a single word
+        firstWordLength = question.answer.Length;
+      }
+
+      Debug.Log("First word length: " + firstWordLength);
+
+      string firstWord = question.answer.Substring(0, firstWordLength);
+
+      Debug.Log("Filling input fields with: " + firstWord);
+
+    // Fill the input fields with letters from the first word
+    for (int i = 0; i < inputFields.Length; i++)
+    {
+        if (i < firstWord.Length)
+        {
+            inputFields[i].text = firstWord[i].ToString(); // Assign each letter to input field
+        }
+        else
+        {
+            inputFields[i].text = ""; // Clear any remaining input fields
+        }
+    }
+
+
+     }
+
+
+
+
+    private void secondHint()
+    {
+        Debug.Log("second Hint");
+
+        string myword = question.answer.Replace(" ", "");
+        int answerLength = myword.Length;
+
+        Debug.Log("Answer length without spaces: " + answerLength);
+
+        int randomLatter = UnityEngine.Random.Range(firstWordLength, answerLength);
+
+        
+        string myLatter = myword[randomLatter].ToString();
+
+        TMP_InputField myField = inputFields[randomLatter];
+
+        myField.text = myLatter;
+
+    }
+
+
+    private void thirdHint()
+    {
+        Debug.Log(" third Hint");
+
+         string myword = question.answer.Replace(" ", "");
+         int answerLength = myword.Length;
+
+         for(int i = 0; i < answerLength; i++)
+         {
+            inputFields[i].text = myword[i].ToString();
+         }
+    }
+
+
+    public void ResetScene()
+    {
+        hintIndex = 0;
+        for(int i = 0; i < inputFields.Length; i++)
+        {
+            inputFields[i].text = "";
+        }
+
+        /*
+        optional :
+        SceneManager.LoadSceneAsync(0);
+        */
+    }
+
+
+
+
+
 }
 
