@@ -10,18 +10,25 @@ public class QuizManager : MonoBehaviour
 
     [SerializeField]
     public QuestionData question;
+
     [SerializeField]
-    private TMP_InputField inputField; // Directly type into this field
+    private TMP_InputField[] inputFields; // Array of input fields
+
     [SerializeField]
     private GameObject letterContainer;
+
     [SerializeField]
     private Image questionImageUI;
+
     [SerializeField]
     private Text questionTextUI;
+
     [SerializeField]
     private TMP_Text messageText;
+
     [SerializeField]
     private AudioClip correctSound;
+    
     [SerializeField]
     private AudioClip wrongSound;
 
@@ -29,7 +36,6 @@ public class QuizManager : MonoBehaviour
     private int hintIndex = 0;
 
     private void Start()
-
     {
         audioSource = GetComponent<AudioSource>();
         DisplayQuestion();
@@ -51,35 +57,51 @@ public class QuizManager : MonoBehaviour
             }
             else
             {
+                Debug.LogWarning("question.questionImage is null");
                 questionImageUI.gameObject.SetActive(false);
             }
         }
     }
 
     public void CheckAnswer()
+{
+    Debug.Log("CheckAnswer function called!");
+
+    // Collect all input field values and combine them into one string
+    string userInput = "";
+    foreach (TMP_InputField inputField in inputFields)
     {
-        Debug.Log("CheckAnswer function called!");
+        userInput += inputField.text; // Append each input field's text
+    }
+    
 
-        string userInput = inputField.text.ToUpper().Trim();
-        Debug.Log("User input: " + userInput);
+    userInput = userInput.ToUpper().Trim(); // Convert to uppercase and trim spaces
+    Debug.Log("User input (processed): " + userInput);
 
-        string correctAnswer = question.answer.ToUpper();
+    // Process the correct answer: Remove spaces and convert to uppercase
+    string correctAnswer = question.answer.Replace(" ", "").ToUpper();
+    Debug.Log("Correct answer (processed): " + correctAnswer);
 
-        if (userInput == correctAnswer)
-        {
-            PlaySound(correctSound);
-            DisplayMessage("CORRECT! 🎉", Color.green);
-            ProceedToNextQuestion();
-        }
-        else
-        {
-            HighlightLetters(userInput, correctAnswer);
-            PlaySound(wrongSound);
-        }
+    // Compare processed user input with processed correct answer
+    if (userInput == correctAnswer)
+    {
+        PlaySound(correctSound);
+        DisplayMessage("CORRECT! 🎉", Color.green);
+        ProceedToNextQuestion();
+    }
+    else
+    {
+        HighlightLetters(userInput, correctAnswer);
+        PlaySound(wrongSound);
+    }
 
-        // Clear the input field after checking
+    // Clear all input fields after checking
+    foreach (TMP_InputField inputField in inputFields)
+    {
         inputField.text = "";
     }
+}
+
 
     private void HighlightLetters(string userInput, string correctAnswer)
     {
@@ -89,7 +111,7 @@ public class QuizManager : MonoBehaviour
             TMP_Text letterText = letter.GetComponentInChildren<TMP_Text>();
             Image letterBackground = letter.GetComponent<Image>();
 
-            if (i < userInput.Length && userInput[i] == correctAnswer[i])
+            if (i < userInput.Length && i < correctAnswer.Length && userInput[i] == correctAnswer[i])
             {
                 letterBackground.color = Color.green;
             }
@@ -147,3 +169,4 @@ public class QuizManager : MonoBehaviour
         Debug.Log("Loading the next question...");
     }
 }
+
