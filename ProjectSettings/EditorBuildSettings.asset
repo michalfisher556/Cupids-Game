@@ -6,13 +6,13 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/WordQuiz/Scenes/1.unity
-    guid: 5e630a5286cc50a4381d27e7dabe4e79
+    path: Assets/Scenes/Level 1.unity
+    guid: fc02e877c49ccfa4397967f15b653d5d
   - enabled: 1
-    path: Assets/WordQuiz/Scenes/base.unity
-    guid: 885b5483e41799d43ab3f6462defc14f
+    path: Assets/Scenes/Level 2.unity
+    guid: 4201e2f02bc39af4a98f8722f41175cb
   - enabled: 1
-    path: Assets/WordQuiz/Scenes/2.unity
-    guid: c6db4ba094263aa429f5a3c75e03f527
+    path: Assets/Scenes/Level 3.unity
+    guid: 46d65fec451e6be40912fe1713954b41
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

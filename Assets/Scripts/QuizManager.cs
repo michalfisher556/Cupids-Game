@@ -22,14 +22,14 @@ public class QuizManager : MonoBehaviour
 
     private TMP_InputField[] inputFields; // Array of input fields
 
-    [SerializeField]
-    private GameObject letterContainer;
+  //  [SerializeField]
+  //  private GameObject letterContainer;
 
-    [SerializeField]
-    private Image questionImageUI;
+  //  [SerializeField]
+   // private Image questionImageUI;
 
-    [SerializeField]
-    private Text questionTextUI;
+  //  [SerializeField]
+ //   private Text questionTextUI;
 
     [SerializeField]
     private TMP_Text messageText;
@@ -127,8 +127,25 @@ public class QuizManager : MonoBehaviour
         }
         audioSource = GetComponent<AudioSource>();
         inputFields[0].Select();
-        DisplayQuestion();
+       // DisplayQuestion();
+
+       
+    
+        int currentScene = SceneManager.GetActiveScene().buildIndex;
+        if(currentScene > 0)
+        {
+           SaveGame();
+        }
+        /*
+        else if(PlayerPrefs.HasKey("SavedScene"))
+        {
+          LoadGame();
+        }
+    */
+
     }
+
+    /*
 
     private void DisplayQuestion()
     {
@@ -153,6 +170,8 @@ public class QuizManager : MonoBehaviour
 
         inputFields[0].Select();
     }
+
+    */
 
     public void CheckAnswer()
 {
@@ -180,7 +199,10 @@ public class QuizManager : MonoBehaviour
 
         PlaySound(correctSound);
         DisplayMessage("CORRECT!", Color.green);
+        HighlightLetters(userInput, correctAnswer);
+        // automatic save the current scene
         ProceedToNextQuestion();
+        
 
        
     }
@@ -214,11 +236,13 @@ public class QuizManager : MonoBehaviour
 
     private void HighlightLetters(string userInput, string correctAnswer)
     {
-        for (int i = 0; i < letterContainer.transform.childCount; i++)
+        Color mycolor = inputFields[0].GetComponent<Image>().color;
+        for (int i = 0; i < inputFields.Length; i++)
         {
-            GameObject letter = letterContainer.transform.GetChild(i).gameObject;
-            TMP_Text letterText = letter.GetComponentInChildren<TMP_Text>();
-            Image letterBackground = letter.GetComponent<Image>();
+            Transform holder = inputFields[i].transform.GetChild(0);
+           // GameObject letter = letterContainer.transform.GetChild(i).gameObject;
+            TMP_Text letterText = holder.GetChild(1).GetComponent<TMP_Text>();
+            Image letterBackground = inputFields[i].GetComponent<Image>();
 
             if (i < userInput.Length && i < correctAnswer.Length && userInput[i] == correctAnswer[i])
             {
@@ -229,6 +253,27 @@ public class QuizManager : MonoBehaviour
                 letterBackground.color = Color.red;
             }
         }
+
+        if(userInput != correctAnswer)
+        {
+            StartCoroutine(FadeLetters(mycolor));
+        }
+
+        
+    }
+
+    private IEnumerator FadeLetters(Color OriginalColor)
+    {
+        yield return new WaitForSeconds(1.5f);
+        for (int i = 0; i < inputFields.Length; i++)
+        {
+            Image letterBackground = inputFields[i].GetComponent<Image>();
+
+            letterBackground.color = OriginalColor;
+
+        }
+        
+
     }
 
     private void PlaySound(AudioClip clip)
@@ -408,11 +453,47 @@ public class QuizManager : MonoBehaviour
             inputFields[i].text = "";
         }
 
+        popHint.text = "";
+
         
     }
 
 
+//........................................................................//
 
+public void OpenMenu()
+{
+    Debug.Log("Open menu");
+}
+
+public void CloseMenu()
+{
+    Debug.Log("Close menu");
+}
+
+//.............................................................................//
+
+    public void SaveGame()
+    {
+        int currentScene = SceneManager.GetActiveScene().buildIndex;
+        PlayerPrefs.SetInt("SavedScene", currentScene);
+        PlayerPrefs.Save();
+        Debug.Log($"Game Saved! Current Scene: {currentScene}");
+    }
+
+    public void LoadGame()
+{
+    if (PlayerPrefs.HasKey("SavedScene"))
+    {
+        int savedScene = PlayerPrefs.GetInt("SavedScene");
+        SceneManager.LoadScene(savedScene);
+        Debug.Log($"Game Loaded! Loading Scene: {savedScene}");
+    }
+    else
+    {
+        Debug.LogWarning("No saved game found!");
+    }
+}
 
 
 
