@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
+using UnityEngine.EventSystems;
 
 public class QuizManager : MonoBehaviour
 {
@@ -44,6 +45,9 @@ public class QuizManager : MonoBehaviour
     private int hintIndex = 0;
     private int mistakes = 0;
     private int firstWordLength = 0;
+
+    private GameObject manager;
+    private CupidsManger cupid;
 
     /*
 
@@ -143,6 +147,12 @@ public class QuizManager : MonoBehaviour
         }
     */
 
+    inputFields[0].shouldHideMobileInput = false; // Ensure mobile keyboard is visible
+
+     manager = GameObject.FindGameObjectWithTag("GameController");
+     cupid = manager.GetComponent<CupidsManger>();
+
+
     }
 
     /*
@@ -175,7 +185,7 @@ public class QuizManager : MonoBehaviour
 
     public void CheckAnswer()
 {
-    Debug.Log("CheckAnswer function called!");
+  //  Debug.Log("CheckAnswer function called!");
 
     // Collect all input field values and combine them into one string
     string userInput = "";
@@ -186,11 +196,11 @@ public class QuizManager : MonoBehaviour
     
     hintIndex = 0;
     userInput = userInput.ToUpper().Trim(); // Convert to uppercase and trim spaces
-    Debug.Log("User input (processed): " + userInput);
+  //  Debug.Log("User input (processed): " + userInput);
 
     // Process the correct answer: Remove spaces and convert to uppercase
     string correctAnswer = question.answer.Replace(" ", "").ToUpper();
-    Debug.Log("Correct answer (processed): " + correctAnswer);
+  //  Debug.Log("Correct answer (processed): " + correctAnswer);
 
     // Compare processed user input with processed correct answer
     if (userInput == correctAnswer)
@@ -376,7 +386,7 @@ public class QuizManager : MonoBehaviour
 
     private void firstHint()
     {
-      Debug.Log("first Hint");
+    //  Debug.Log("first Hint");
       firstWordLength = question.answer.IndexOf(' ');
 
       if (firstWordLength == -1)
@@ -385,11 +395,11 @@ public class QuizManager : MonoBehaviour
         firstWordLength = question.answer.Length;
       }
 
-      Debug.Log("First word length: " + firstWordLength);
+   //   Debug.Log("First word length: " + firstWordLength);
 
       string firstWord = question.answer.Substring(0, firstWordLength);
 
-      Debug.Log("Filling input fields with: " + firstWord);
+    //  Debug.Log("Filling input fields with: " + firstWord);
 
     // Fill the input fields with letters from the first word
     for (int i = 0; i < inputFields.Length; i++)
@@ -412,12 +422,12 @@ public class QuizManager : MonoBehaviour
 
     private void secondHint()
     {
-        Debug.Log("second Hint");
+      //  Debug.Log("second Hint");
 
         string myword = question.answer.Replace(" ", "");
         int answerLength = myword.Length;
 
-        Debug.Log("Answer length without spaces: " + answerLength);
+      //  Debug.Log("Answer length without spaces: " + answerLength);
 
         int randomLatter = UnityEngine.Random.Range(firstWordLength, answerLength);
 
@@ -433,7 +443,7 @@ public class QuizManager : MonoBehaviour
 
     private void thirdHint()
     {
-        Debug.Log(" third Hint");
+       // Debug.Log(" third Hint");
 
          string myword = question.answer.Replace(" ", "");
          int answerLength = myword.Length;
@@ -463,12 +473,26 @@ public class QuizManager : MonoBehaviour
 
 public void OpenMenu()
 {
-    Debug.Log("Open menu");
+    if(cupid != null)
+    {
+        cupid.ClosePannel();
+    }
+    else 
+    {
+        Debug.LogWarning("cupid manger dont work");
+    }
 }
 
 public void CloseMenu()
 {
-    Debug.Log("Close menu");
+    if(cupid != null)
+    {
+        cupid.Resume();
+    }
+    else 
+    {
+        Debug.LogWarning("cupid manger dont work");
+    }
 }
 
 //.............................................................................//
